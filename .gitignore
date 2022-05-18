@@ -1,0 +1,9 @@
+*.phar
+*.phar.asc
+.phpunit.result.cache
+build
+composer.lock
+coverage
+docs
+tools
+vendor

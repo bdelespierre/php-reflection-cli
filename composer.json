@@ -1,0 +1,48 @@
+{
+    "name": "bdelespierre/php-reflection-cli",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Benjamin Delespierre",
+            "email": "benjamin.delespierre@gmail.com"
+        }
+    ],
+    "license": "MIT",
+    "require": {
+        "php": "^8.0",
+        "symfony/console": "^6.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5",
+        "clue/phar-composer": "^1.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Bdelespierre\\PhpReflectionCli\\": "src/"
+        }
+    },
+    "bin": [
+        "bin/php-reflection-cli"
+    ],
+    "scripts": {
+        "test": [
+            "vendor/bin/phpunit --color=always"
+        ],
+        "clean": [
+            "rm -rf build/phar/ build/*.phar build/*.phar.asc"
+        ],
+        "build": [
+            "@clean",
+            "mkdir -p build/phar/",
+            "cp -rp -t build/phar/ src/ bin/ composer.json composer.lock",
+            "bin/php-reflection-cli --version | awk 'BEGIN { ORS = \"\"; } { print $4 }' > build/phar/.version",
+            "@composer install --working-dir=build/phar/ --no-dev --no-interaction --no-progress --no-ansi",
+            "cat build/phar/.version | xargs -i php -d phar.readonly=off vendor/bin/phar-composer --no-ansi build build/phar/ build/php-reflection-cli-{}.phar",
+            "rm -rf build/phar/"
+        ],
+        "build:sign": [
+            "@build",
+            "gpg --armor --detach-sign build/php-reflection-cli-*.phar"
+        ]
+    }
+}
